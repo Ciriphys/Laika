@@ -1,0 +1,23 @@
+name: "Build project on Linux"
+
+on: [push]
+
+jobs:
+    build:
+        name: Build project
+        strategy:
+            matrix:
+                os: [ubuntu-latest]
+                build-configs: ["debug", "release"]
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Checkout codebase
+              uses: actions/checkout@v3
+            - name: Setup premake5
+              uses: abel0b/setup-premake@v2.3
+              with:
+                version: "5.0.0-beta2"
+            - name: Generate project files
+              run: premake5 gmake2
+            - name: Building
+              run: make config=${{matrix.build-configs}}
