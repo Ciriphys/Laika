@@ -2,7 +2,7 @@
 
 #include "test.h"
 
-void converter_print(const char* message)
+void dll_print(const char* message)
 {
 	printf("%s", message);
 }

@@ -13,3 +13,9 @@
         #define CVT_API extern
     #endif
 #endif
+
+// Suppress IntelliSense's C warnings on Windows
+#ifdef CVT_WIN
+    #pragma warning(disable:6011)
+    #pragma warning(disable:6387)
+#endif

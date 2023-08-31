@@ -2,4 +2,4 @@
 
 #include "core.h"
 
-CVT_API void converter_print(const char* message);
+CVT_API void dll_print(const char* message);
