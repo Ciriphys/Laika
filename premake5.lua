@@ -20,7 +20,7 @@ workspace "Converter"
 
         postbuildcommands
         {
-            "{COPY} ../../Binaries/" .. outDir .. "/ConverterLib/*.dll ../../Binaries/" .. outDir .. "/ConverterCLI"
+            ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/ConverterCLI")
         }
 
         filter "system:Windows"
@@ -33,10 +33,22 @@ workspace "Converter"
             system "macosx"
             defines { "CVT_MACOS" }
 
+            prelinkcommands
+            {
+               ("mkdir -p ../../Binaries/" .. outDir .. "/ConverterCLI")
+            }
+    
+
         filter "system:Linux"
             pic "On"
             system "Linux"
             defines { "CVT_LINUX" }
+
+            prelinkcommands
+            {
+               ("mkdir -p ../../Binaries/" .. outDir .. "/ConverterCLI")
+            }
+    
 
         filter { "configurations:Debug" }
             defines { "CVT_DEBUG", "DEBUG" }

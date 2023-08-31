@@ -27,7 +27,7 @@ def DarwinCleanMakefile():
     return
 
 def DarwinCleanXCode(location, projName):
-    project = f"{location}{projName}.xcodeproj/"
+    project = f"{location}/{projName}.xcodeproj/"
     WrapperRemoveTree(workspace)
     WrapperRemoveTree(project)
     print(f"Cleaned {project}.")
@@ -35,9 +35,9 @@ def DarwinCleanXCode(location, projName):
 
 def WinCleanVS(location, projName):
     solution = f"{workspaceName}.sln"
-    project = f"{location}{projName}.vcxproj"
-    user = f"{location}{projName}.vcxproj.user"
-    filt = f"{location}{projName}.vcxproj.filters"
+    project = f"{location}/{projName}.vcxproj"
+    user = f"{location}/{projName}.vcxproj.user"
+    filt = f"{location}/{projName}.vcxproj.filters"
     vsfold = ".vs/"
     RemoveFile(solution)
     RemoveFile(project)
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         if os.path.exists("Makefile") or os.path.exists(".vscode/"):
             DarwinCleanMakefile()
         if os.path.exists(f"{workspaceName}.xcworkspace"):
-            workspace = f"{workspace}.xcworkspace/"
+            workspace = f"{workspaceName}.xcworkspace/"
             DarwinCleanXCode("Build/Core", "ConverterLib")
             DarwinCleanXCode("Build/CLI", "ConverterCLI")
 

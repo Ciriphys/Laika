@@ -1,17 +1,14 @@
 import platform
 import os
 
-projectName = "ConverterLib"
-
-def XCodeSetPCHLocation():
-    global projectName
+def XCodeSetPCHLocation(location, projectName):
     filedata = ""
-    with open(f"Build/{projectName}.xcodeproj/project.pbxproj", "r") as file:
+    with open(f"{location}/{projectName}.xcodeproj/project.pbxproj", "r") as file:
         filedata = file.read()
     
     filedata = filedata.replace("GCC_PREFIX_HEADER = pch.h", "GCC_PREFIX_HEADER = Include/pch.h")
 
-    with open(f"Build/{projectName}.xcodeproj/project.pbxproj", "w+") as file:
+    with open(f"{location}/{projectName}.xcodeproj/project.pbxproj", "w+") as file:
         file.write(filedata)
 
 if __name__ == "__main__":
@@ -34,4 +31,5 @@ if __name__ == "__main__":
     os.system(command)
     
     if selection == "xcode4":
-        XCodeSetPCHLocation()
+        XCodeSetPCHLocation("Build/Core", "ConverterLib")
+        XCodeSetPCHLocation("Build/CLI", "ConverterCLI")
