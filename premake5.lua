@@ -18,16 +18,17 @@ workspace "Converter"
 
         defines { "CVT_BUILD_DLL" }
 
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/ConverterCLI")
-        }
-
         filter "system:Windows"
             staticruntime "On"
             systemversion "latest"
             system "windows"
             defines { "CVT_WIN" }
+
+             postbuildcommands
+            {
+                "{COPY} ../../Binaries/" .. outDir .. "/ConverterLib/*.dll ../../Binaries/" .. outDir .. "/ConverterCLI",
+                "{COPY} ../../Binaries/" .. outDir .. "/ConverterLib/*.lib ../../Binaries/" .. outDir .. "/ConverterCLI"
+            }
 
         filter "system:Macosx"
             system "macosx"
@@ -38,6 +39,10 @@ workspace "Converter"
                ("mkdir -p ../../Binaries/" .. outDir .. "/ConverterCLI")
             }
     
+            postbuildcommands
+            {
+                ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/ConverterCLI")
+            }
 
         filter "system:Linux"
             pic "On"
@@ -48,7 +53,11 @@ workspace "Converter"
             {
                ("mkdir -p ../../Binaries/" .. outDir .. "/ConverterCLI")
             }
-    
+
+            postbuildcommands
+            {
+                ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/ConverterCLI")
+            }
 
         filter { "configurations:Debug" }
             defines { "CVT_DEBUG", "DEBUG" }
