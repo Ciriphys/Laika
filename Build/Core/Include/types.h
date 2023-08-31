@@ -2,10 +2,10 @@
 
 // Integer types
 
-typedef char u8_t;
+typedef char i8_t;
 typedef unsigned char u8_t;
 
-typedef short u16_t;
+typedef short i16_t;
 typedef unsigned short u16_t;
 
 typedef int i32_t;
@@ -17,4 +17,7 @@ typedef unsigned long long int u64_t;
 // Aliases
 
 typedef unsigned char byte_t;
-typedef unsigned long long int size_t;
+
+#ifdef CLI_WIN
+	typedef unsigned long long int size_t;
+#endif

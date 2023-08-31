@@ -1,11 +1,11 @@
-workspace "Converter"
+workspace "Laika"
     architecture "x64"
     configurations { "Debug", "Release" }
-    startproject "ConverterCLI"
+    startproject "LaikaCLI"
 
     outDir = "%{cfg.buildcfg}_%{cfg.system}_%{cfg.architecture}"
     
-    project "ConverterLib"
+    project "LaikaLib"
         location "Build/Core"
         kind "SharedLib"
         language "C"
@@ -16,60 +16,60 @@ workspace "Converter"
         files { "Build/Core/Source/**.c", "Build/Core/Include/**.h" }
         includedirs { "Build/Core/Include" }
 
-        defines { "CVT_BUILD_DLL" }
+        defines { "LKA_BUILD_DLL" }
 
         filter "system:Windows"
             staticruntime "On"
             systemversion "latest"
             system "windows"
-            defines { "CVT_WIN" }
+            defines { "LKA_WIN" }
 
              postbuildcommands
             {
-                "{COPY} ../../Binaries/" .. outDir .. "/ConverterLib/*.dll ../../Binaries/" .. outDir .. "/ConverterCLI",
-                "{COPY} ../../Binaries/" .. outDir .. "/ConverterLib/*.lib ../../Binaries/" .. outDir .. "/ConverterCLI"
+                "{COPY} ../../Binaries/" .. outDir .. "/LaikaLib/*.dll ../../Binaries/" .. outDir .. "/LaikaCLI",
+                "{COPY} ../../Binaries/" .. outDir .. "/LaikaLib/*.lib ../../Binaries/" .. outDir .. "/LaikaCLI"
             }
 
         filter "system:Macosx"
             system "macosx"
-            defines { "CVT_MACOS" }
+            defines { "LKA_MACOS" }
 
             prelinkcommands
             {
-               ("mkdir -p ../../Binaries/" .. outDir .. "/ConverterCLI")
+               ("mkdir -p ../../Binaries/" .. outDir .. "/LaikaCLI")
             }
     
             postbuildcommands
             {
-                ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/ConverterCLI")
+                ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/LaikaCLI")
             }
 
         filter "system:Linux"
             pic "On"
             system "Linux"
-            defines { "CVT_LINUX" }
+            defines { "LKA_LINUX" }
 
             prelinkcommands
             {
-               ("mkdir -p ../../Binaries/" .. outDir .. "/ConverterCLI")
+               ("mkdir -p ../../Binaries/" .. outDir .. "/LaikaCLI")
             }
 
             postbuildcommands
             {
-                ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/ConverterCLI")
+                ("{COPY} %{cfg.buildtarget.relpath} ../../Binaries/" .. outDir .. "/LaikaCLI")
             }
 
         filter { "configurations:Debug" }
-            defines { "CVT_DEBUG", "DEBUG" }
+            defines { "LKA_DEBUG", "DEBUG" }
             optimize "Debug"
             symbols "On"
 
         filter { "configurations:Release" }
-            defines { "CVT_RELEASE", "NDEBUG" }
+            defines { "LKA_RELEASE", "NDEBUG" }
             optimize "Full"
             symbols "Off"
 
-    project "ConverterCLI"
+    project "LaikaCLI"
         location "Build/CLI"
         kind "ConsoleApp"
         language "C"
@@ -80,7 +80,7 @@ workspace "Converter"
         files { "Build/CLI/Source/**.c", "Build/CLI/Include/**.h" }
         includedirs { "Build/CLI/Include", "Build/Core/Include" }
 
-        links { "ConverterLib" }
+        links { "LaikaLib" }
 
         filter "system:Windows"
             staticruntime "On"

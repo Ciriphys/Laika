@@ -5,7 +5,7 @@
 #include "application.h"
 
 application_t* application = NULL;
-const char* commands[COMMAND_COUNT] = { "load", "quit" };
+const char* commands[COMMAND_COUNT] = { "load", "drop", "quit" };
 
 application_t* create_application_context(const char* program_path, size_t buflen)
 {
@@ -13,7 +13,7 @@ application_t* create_application_context(const char* program_path, size_t bufle
 
     application = (application_t*)malloc(sizeof(application_t));
 
-    application->program_path = (char*)malloc(buflen * sizeof(char) + 1);
+    application->program_path = (char*)malloc(buflen + 1);
     application->loaded_filename = (char*)malloc(1);
     application->running = 1;
     application->exit_code = -1;
@@ -42,7 +42,8 @@ void application_run(application_t* context)
     {
         char command[COMMAND_LENGTH];
         printf("[%s] $ ", application_get_mode_text(context->mode));
-        gets(command, COMMAND_LENGTH);
+        fgets(command, COMMAND_LENGTH, stdin);
+        command[strlen(command) - 1] = 0;
 
         application_parse_command(command);
     }
@@ -54,7 +55,7 @@ void application_display_error_message(i32_t result)
     printf("Error code: %d\n", result);
 }
 
-const char* application_get_mode_text(application_mode_t mode)
+char* application_get_mode_text(application_mode_t mode)
 {
     switch (mode)
     {
@@ -73,15 +74,29 @@ i32_t command_load(char** params, i32_t count)
     if (count > MAX_LOAD_PARAMS) return COMMAND_OVERFLOW;
    
     char* filename = params[1];
-    FILE* file = fopen(filename, "r");
+    FILE* file = fopen(filename, "rb");
 
     if (!file) return COMMAND_INVALID_DATA;
 
     fclose(file);
-    free(file);
 
+    free(application->loaded_filename);
     application->mode = Loaded;
-    application->loaded_filename = filename;
+    application->loaded_filename = (char*)malloc(strlen(filename) + 1);
+    strcpy(application->loaded_filename, filename);
+    application->loaded_filename[strlen(filename)] = 0;
+
+    return COMMAND_SUCCESS;
+}
+
+i32_t command_drop(char** params, i32_t count)
+{
+    if (count > MAX_DROP_PARAMS) return COMMAND_OVERFLOW;
+
+	free(application->loaded_filename);
+	application->mode = None;
+    application->loaded_filename = (char*)malloc(1);
+	application->loaded_filename[0] = 0;
 
     return COMMAND_SUCCESS;
 }
@@ -110,16 +125,16 @@ void application_parse_command(char* command)
                 params = (char**)realloc(params, capacity);
             }
 
-            params[size] = (char*)malloc(i + 1ui64);
+            params[size] = (char*)malloc(i + 1);
 
-            const char* source = size == 0 ? command : command + strlen(params[size - 1]);
-            size_t count = size == 0 ? i : i - strlen(params[size - 1]);
+            const char* source = size == 0 ? command : command + strlen(params[size - 1]) + 1;
+            size_t count = size == 0 ? i : i - strlen(params[size - 1]) - 1;
 
-            strncpy(params[size], source, count);
-            params[size][i] = NULL;
+            char* debug = strncpy(params[size], source, count);
+            params[size][count] = 0;
             size++;
 
-            if (command[i] == NULL) break;
+            if (command[i] == 0) break;
         }
 	}
 
@@ -155,9 +170,11 @@ int application_invoke_command(i32_t command, char** params, i32_t count)
 {
     switch (command)
     {
-    case 0:
+    case COMMAND_LOAD:
         return command_load(params, count);
-    case 1:
+    case COMMAND_DROP:
+        return command_drop(params, count);
+    case COMMAND_EXIT:
         return command_exit(0);
     default:
         return -1;

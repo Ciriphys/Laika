@@ -31,5 +31,5 @@ if __name__ == "__main__":
     os.system(command)
     
     if selection == "xcode4":
-        XCodeSetPCHLocation("Build/Core", "ConverterLib")
-        XCodeSetPCHLocation("Build/CLI", "ConverterCLI")
+        XCodeSetPCHLocation("Build/Core", "LaikaLib")
+        XCodeSetPCHLocation("Build/CLI", "LaikaCLI")

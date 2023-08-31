@@ -48,20 +48,20 @@ def WinCleanVS(location, projName):
 
 if __name__ == "__main__":
     system = platform.system()
-    projectName = "ConverterLib"
-    workspaceName = "Converter"
+    projectName = "LaikaLib"
+    workspaceName = "Laika"
 
     if system == "Darwin":
         if os.path.exists("Makefile") or os.path.exists(".vscode/"):
             DarwinCleanMakefile()
         if os.path.exists(f"{workspaceName}.xcworkspace"):
             workspace = f"{workspaceName}.xcworkspace/"
-            DarwinCleanXCode("Build/Core", "ConverterLib")
-            DarwinCleanXCode("Build/CLI", "ConverterCLI")
+            DarwinCleanXCode("Build/Core", "LaikaLib")
+            DarwinCleanXCode("Build/CLI", "LaikaCLI")
 
     elif system == "Windows":
-        WinCleanVS("Build/Core", "ConverterLib")
-        WinCleanVS("Build/CLI", "ConverterCLI")
+        WinCleanVS("Build/Core", "LaikaLib")
+        WinCleanVS("Build/CLI", "LaikaCLI")
 
     elif system == "Linux":
         DarwinCleanMakefile()
@@ -72,6 +72,5 @@ if __name__ == "__main__":
 
     RemoveFile("todo.txt")
     WrapperRemoveTree("Binaries/")
-    WrapperRemoveTree("Build/ProfilerLogs")
     print("Nothing left to clean. Halting")
     exit(0)
