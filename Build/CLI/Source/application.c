@@ -7,7 +7,7 @@
 application_t* application = NULL;
 const char* commands[COMMAND_COUNT] = { "load", "drop", "quit" };
 
-application_t* create_application_context(const char* program_path, size_t buflen)
+application_t* create_application_context(const char* program_path, u32_t buflen)
 {
     if (application) destroy_application_context(application);
 
@@ -31,6 +31,7 @@ i32_t destroy_application_context(application_t* app_ptr)
     i32_t exit_code = app_ptr->exit_code;
 
     free(app_ptr->program_path);
+    free(app_ptr->loaded_filename);
     free(app_ptr);
 
     return exit_code;

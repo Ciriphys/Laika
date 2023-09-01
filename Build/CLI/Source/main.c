@@ -1,5 +1,6 @@
-#include "application.h"
+#include <string.h>
 
+#include "application.h"
 #include "converter.h"
 
 int main(int argc, char** argv)

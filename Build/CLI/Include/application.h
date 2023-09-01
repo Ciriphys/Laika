@@ -42,7 +42,7 @@ struct __application_t
 
 typedef struct __application_t application_t;
 
-application_t* create_application_context(const char* program_path, size_t buflen);
+application_t* create_application_context(const char* program_path, u32_t buflen);
 i32_t	destroy_application_context(application_t* app_ptr);
 
 void    application_evaluate_command(char** params, i32_t count);

@@ -17,7 +17,3 @@ typedef unsigned long long int u64_t;
 // Aliases
 
 typedef unsigned char byte_t;
-
-#ifdef CLI_WIN
-	typedef unsigned long long int size_t;
-#endif
