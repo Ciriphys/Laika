@@ -35,6 +35,7 @@ struct __application_t
 	i32_t running;
 
 	application_mode_t mode;
+	char* loaded_filepath;
 	char* loaded_filename;
 
 	i32_t exit_code;
@@ -57,3 +58,6 @@ char*	application_get_mode_text(application_mode_t mode);
 i32_t command_load(char** params, i32_t count);
 i32_t command_drop(char** params, i32_t count);
 i32_t command_exit(i32_t exit_code);
+
+char* extract_filename (char* filepath);
+char* extract_extension(char* filename);

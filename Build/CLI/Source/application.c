@@ -14,6 +14,7 @@ application_t* create_application_context(const char* program_path, u32_t buflen
     application = (application_t*)malloc(sizeof(application_t));
 
     application->program_path = (char*)malloc(buflen + 1);
+    application->loaded_filepath = (char*)malloc(1);
     application->loaded_filename = (char*)malloc(1);
     application->running = 1;
     application->exit_code = -1;
@@ -21,6 +22,7 @@ application_t* create_application_context(const char* program_path, u32_t buflen
 
     strcpy(application->program_path, program_path);
     application->program_path[buflen] = 0;
+    application->loaded_filepath[0] = 0;
     application->loaded_filename[0] = 0;
 
     return application;
@@ -31,7 +33,7 @@ i32_t destroy_application_context(application_t* app_ptr)
     i32_t exit_code = app_ptr->exit_code;
 
     free(app_ptr->program_path);
-    free(app_ptr->loaded_filename);
+    free(app_ptr->loaded_filepath);
     free(app_ptr);
 
     return exit_code;
@@ -74,18 +76,25 @@ i32_t command_load(char** params, i32_t count)
     if (count == 1) return COMMAND_MISSING_DATA;
     if (count > MAX_LOAD_PARAMS) return COMMAND_OVERFLOW;
    
-    char* filename = params[1];
-    FILE* file = fopen(filename, "rb");
+    char* filepath = params[1];
+    FILE* file = fopen(filepath, "rb");
 
     if (!file) return COMMAND_INVALID_DATA;
 
     fclose(file);
 
+    free(application->loaded_filepath);
     free(application->loaded_filename);
+
     application->mode = Loaded;
-    application->loaded_filename = (char*)malloc(strlen(filename) + 1);
-    strcpy(application->loaded_filename, filename);
-    application->loaded_filename[strlen(filename)] = 0;
+    application->loaded_filepath = (char*)malloc(strlen(filepath) + 1);
+    strcpy(application->loaded_filepath, filepath);
+    application->loaded_filepath[strlen(filepath)] = 0;
+
+    application->loaded_filename = extract_filename(filepath);
+
+    printf("Loaded filename: %s\n", application->loaded_filename);
+    printf("Filename extension: %s\n", extract_extension(application->loaded_filename));
 
     return COMMAND_SUCCESS;
 }
@@ -94,9 +103,13 @@ i32_t command_drop(char** params, i32_t count)
 {
     if (count > MAX_DROP_PARAMS) return COMMAND_OVERFLOW;
 
-	free(application->loaded_filename);
+	free(application->loaded_filepath);
+    free(application->loaded_filename);
+
 	application->mode = None;
+    application->loaded_filepath = (char*)malloc(1);
     application->loaded_filename = (char*)malloc(1);
+	application->loaded_filepath[0] = 0;
 	application->loaded_filename[0] = 0;
 
     return COMMAND_SUCCESS;
@@ -108,6 +121,40 @@ i32_t command_exit(i32_t exit_code)
     application->running = 0;
 
     return exit_code;
+}
+
+char* extract_filename(char* filepath)
+{
+    i32_t length = (i32_t)strlen(filepath);
+    i32_t offset = 0;
+
+    #ifdef CLI_WIN
+	    char folder_separator = '\\';
+    #else
+	    char folder_separator = '/';
+    #endif
+
+    for (i32_t i = length - 1; i > 0; i--) if (filepath[i] == folder_separator) offset = i + 1;
+
+    char* filename = (char*)malloc(length - offset + 1);
+    strncpy(filename, filepath + offset, length - offset);
+    filename[length - offset] = 0;
+
+    return filename;
+}
+
+char* extract_extension(char* filename)
+{
+    i32_t length = (i32_t)strlen(filename);
+    i32_t offset = 0;
+
+    for (i32_t i = length - 1; i > 0; i--) if (filename[i] == '.') offset = i + 1;
+
+	char* extension = (char*)malloc(length - offset + 1);
+	strncpy(extension, filename + offset, length - offset);
+    extension[length - offset] = 0;
+
+	return extension;
 }
 
 void application_parse_command(char* command)
