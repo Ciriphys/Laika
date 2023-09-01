@@ -34,6 +34,7 @@ i32_t destroy_application_context(application_t* app_ptr)
 
     free(app_ptr->program_path);
     free(app_ptr->loaded_filepath);
+    free(app_ptr->loaded_filename);
     free(app_ptr);
 
     return exit_code;
@@ -55,7 +56,7 @@ void application_run(application_t* context)
 void application_display_error_message(i32_t result)
 {
     // TODO : Add message for each error code
-    printf("Error code: %d\n", result);
+    printf("Error code: %#06x\n", result);
 }
 
 char* application_get_mode_text(application_mode_t mode)
@@ -74,7 +75,6 @@ char* application_get_mode_text(application_mode_t mode)
 i32_t command_load(char** params, i32_t count)
 {
     if (count == 1) return COMMAND_MISSING_DATA;
-    if (count > MAX_LOAD_PARAMS) return COMMAND_OVERFLOW;
    
     char* filepath = params[1];
     FILE* file = fopen(filepath, "rb");
@@ -101,8 +101,6 @@ i32_t command_load(char** params, i32_t count)
 
 i32_t command_drop(char** params, i32_t count)
 {
-    if (count > MAX_DROP_PARAMS) return COMMAND_OVERFLOW;
-
 	free(application->loaded_filepath);
     free(application->loaded_filename);
 
@@ -171,7 +169,7 @@ void application_parse_command(char* command)
             if (size >= capacity)
             {
                 capacity += 2;
-                params = (char**)realloc(params, capacity);
+                params = (char**)realloc(params, capacity * sizeof(char*));
             }
 
             params[size] = (char*)malloc(i + 1);
@@ -195,6 +193,8 @@ void application_evaluate_command(char** params, i32_t count)
 {
     if (count == 0) return;
 
+    i32_t valid = 0;
+
     // Load the first command
     char* command = params[0];
 
@@ -204,8 +204,12 @@ void application_evaluate_command(char** params, i32_t count)
         {
             i32_t result = application_invoke_command(i, params, count);
             if (result) application_display_error_message(result);
+
+            valid = 1;
         }
     }
+
+    if (!valid) application_display_error_message(INVALID_ID);
 
     // Destroy the parameters information
 	for (i32_t i = 0; i < count; i++)
@@ -220,11 +224,11 @@ int application_invoke_command(i32_t command, char** params, i32_t count)
 {
     switch (command)
     {
-    case COMMAND_LOAD:
+    case LOAD_ID:
         return command_load(params, count);
-    case COMMAND_DROP:
+    case DROP_ID:
         return command_drop(params, count);
-    case COMMAND_EXIT:
+    case EXIT_ID:
         return command_exit(0);
     default:
         return -1;

@@ -9,5 +9,7 @@ int main(int argc, char** argv)
     application_run(context);
     destroy_application_context(context);
 
+    dll_print("Bye, from dll.");
+
     return 0;
 }

@@ -7,14 +7,16 @@
 #define COMMAND_LENGTH 64
 #define COMMAND_COUNT  3
 
-#define COMMAND_SUCCESS 0x0	
-#define COMMAND_MISSING_DATA 0x1	// Missing data for parameters
-#define COMMAND_OVERFLOW 0x2		// Too many commands passed
-#define COMMAND_INVALID_DATA 0x3	// Invalid data passed (file not found)
+#define COMMAND_SUCCESS 0x0000	
+#define COMMAND_MISSING_DATA 0x0001	// Missing data for parameters
+#define COMMAND_OVERFLOW 0x0002		// Too many commands passed [Deprecated]
+#define COMMAND_INVALID_DATA 0x0003	// Invalid data passed (file not found)
 
-#define COMMAND_LOAD 0x0
-#define COMMAND_DROP 0x1
-#define COMMAND_EXIT 0x2
+#define LOAD_ID 0x0000
+#define DROP_ID 0x0001
+#define EXIT_ID 0x0002
+
+#define INVALID_ID 0xffff
 
 #define MAX_LOAD_PARAMS 2
 #define MAX_DROP_PARAMS 1
