@@ -20,8 +20,8 @@ application_t* create_application_context(const char* program_path, u32_t buflen
     application->mode = None;
 
     strcpy(application->program_path, program_path);
-    application->program_path[buflen] = NULL;
-    application->loaded_filename[0] = NULL;
+    application->program_path[buflen] = 0;
+    application->loaded_filename[0] = 0;
 
     return application;
 }
@@ -116,22 +116,24 @@ void application_parse_command(char* command)
     i32_t capacity = 2;
     char** params = (char**)malloc(capacity * sizeof(char*));
 
+    // Parse the command data
 	for (i32_t i = 0; i < COMMAND_LENGTH; i++)
 	{
         if (command[i] == 32 || command[i] == 0)
         {
             if (size >= capacity)
             {
-                capacity *= 1.5f;
+                capacity += 2;
                 params = (char**)realloc(params, capacity);
             }
 
             params[size] = (char*)malloc(i + 1);
 
+            // Move the source pointer and calculate the byte count accordingly
             const char* source = size == 0 ? command : command + strlen(params[size - 1]) + 1;
-            size_t count = size == 0 ? i : i - strlen(params[size - 1]) - 1;
+            u32_t count = size == 0 ? i : i - (u32_t)strlen(params[size - 1]) - 1;
 
-            char* debug = strncpy(params[size], source, count);
+            strncpy(params[size], source, count);
             params[size][count] = 0;
             size++;
 

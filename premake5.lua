@@ -22,9 +22,9 @@ workspace "Laika"
             staticruntime "On"
             systemversion "latest"
             system "windows"
-            defines { "LKA_WIN" }
+            defines { "LKA_WIN", "_CRT_SECURE_NO_WARNINGS" }
 
-             postbuildcommands
+            postbuildcommands
             {
                 "{COPY} ../../Binaries/" .. outDir .. "/LaikaLib/*.dll ../../Binaries/" .. outDir .. "/LaikaCLI",
                 "{COPY} ../../Binaries/" .. outDir .. "/LaikaLib/*.lib ../../Binaries/" .. outDir .. "/LaikaCLI"
@@ -48,6 +48,7 @@ workspace "Laika"
             pic "On"
             system "Linux"
             defines { "LKA_LINUX" }
+            buildoptions { "-Wno-unused-result" }
 
             prelinkcommands
             {
@@ -86,7 +87,7 @@ workspace "Laika"
             staticruntime "On"
             systemversion "latest"
             system "windows"
-            defines { "CLI_WIN" }
+            defines { "CLI_WIN", "_CRT_SECURE_NO_WARNINGS" }
 
         filter "system:Macosx"
             system "macosx"
@@ -96,6 +97,7 @@ workspace "Laika"
             pic "On"
             system "Linux"
             defines { "CLI_LINUX" }
+            buildoptions { "-Wno-unused-result" }
 
         filter { "configurations:Debug" }
             defines { "CLI_DEBUG", "DEBUG" }
