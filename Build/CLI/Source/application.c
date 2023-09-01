@@ -6,6 +6,7 @@
 
 application_t* application = NULL;
 const char* commands[COMMAND_COUNT] = { "load", "drop", "quit" };
+const char* extensions[EXTENSIONS_COUNT] = { "bmp", "dib" };
 
 application_t* create_application_context(const char* program_path, u32_t buflen)
 {
@@ -64,7 +65,7 @@ char* application_get_mode_text(application_mode_t mode)
     switch (mode)
     {
     case None:
-        return "Convert";
+        return "Laika";
     case Loaded:
         return application->loaded_filename;
     default:
@@ -77,10 +78,12 @@ i32_t command_load(char** params, i32_t count)
     if (count == 1) return COMMAND_MISSING_DATA;
    
     char* filepath = params[1];
+    char* extension = extract_extension(filepath);
+
+    if (check_extension(extension)) return COMMAND_INVALID_EXTENSION;
+
     FILE* file = fopen(filepath, "rb");
-
     if (!file) return COMMAND_INVALID_DATA;
-
     fclose(file);
 
     free(application->loaded_filepath);
@@ -94,7 +97,9 @@ i32_t command_load(char** params, i32_t count)
     application->loaded_filename = extract_filename(filepath);
 
     printf("Loaded filename: %s\n", application->loaded_filename);
-    printf("Filename extension: %s\n", extract_extension(application->loaded_filename));
+    printf("Filename extension: %s\n", extension);
+
+    free(extension);
 
     return COMMAND_SUCCESS;
 }
@@ -117,6 +122,7 @@ i32_t command_exit(i32_t exit_code)
 {
     application->exit_code = exit_code;
     application->running = 0;
+    application->running = 0;
 
     return exit_code;
 }
@@ -126,13 +132,14 @@ char* extract_filename(char* filepath)
     i32_t length = (i32_t)strlen(filepath);
     i32_t offset = 0;
 
-    #ifdef CLI_WIN
-	    char folder_separator = '\\';
-    #else
-	    char folder_separator = '/';
-    #endif
-
-    for (i32_t i = length - 1; i > 0; i--) if (filepath[i] == folder_separator) offset = i + 1;
+	for (i32_t i = length - 1; i > 0; i--)
+	{
+		if (filepath[i] == '\\' || filepath[i] == '/')
+		{
+			offset = i + 1;
+			break;
+		}
+	}
 
     char* filename = (char*)malloc(length - offset + 1);
     strncpy(filename, filepath + offset, length - offset);
@@ -146,13 +153,33 @@ char* extract_extension(char* filename)
     i32_t length = (i32_t)strlen(filename);
     i32_t offset = 0;
 
-    for (i32_t i = length - 1; i > 0; i--) if (filename[i] == '.') offset = i + 1;
+    for (i32_t i = length - 1; i > 0; i--)
+    {
+        if (filename[i] == '.')
+        {
+            offset = i + 1;
+            break;
+        }
+    }
 
 	char* extension = (char*)malloc(length - offset + 1);
 	strncpy(extension, filename + offset, length - offset);
     extension[length - offset] = 0;
 
 	return extension;
+}
+
+i32_t check_extension(char* extension)
+{
+    for (i32_t i = 0; i < EXTENSIONS_COUNT; i++)
+    {
+        if (strcmp(extension, extensions[i]) == 0)
+        {
+            return SUCCESS;
+        }
+    }
+
+    return ERROR;
 }
 
 void application_parse_command(char* command)
