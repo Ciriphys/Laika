@@ -3,6 +3,8 @@
 #include "warnings.h"
 #include "converter.h"
 
+#include "Image/bitmap.h"
+
 // Maybe this should be increased?
 #define COMMAND_LENGTH		64
 #define COMMAND_COUNT		3
@@ -13,6 +15,8 @@
 #define COMMAND_OVERFLOW			0x0002		// Too many commands passed [Deprecated]
 #define COMMAND_INVALID_DATA		0x0003		// Invalid data passed (file not found)
 #define COMMAND_INVALID_EXTENSION	0x0004		
+#define COMMAND_INVALID_MODE		0x0005		
+#define COMMAND_LOAD_ERROR			0x0006		// Caused when the object loading function returns NULL
 
 #define LOAD_ID 0x0000
 #define DROP_ID 0x0001
@@ -44,6 +48,8 @@ struct __application_t
 	application_mode_t mode;
 	char* loaded_filepath;
 	char* loaded_filename;
+
+	bitmap_t* image;
 
 	i32_t exit_code;
 };

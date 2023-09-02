@@ -15,16 +15,15 @@ application_t* create_application_context(const char* program_path, u32_t buflen
     application = (application_t*)malloc(sizeof(application_t));
 
     application->program_path = (char*)malloc(buflen + 1);
-    application->loaded_filepath = (char*)malloc(1);
-    application->loaded_filename = (char*)malloc(1);
+	application->loaded_filepath = NULL;
+	application->loaded_filename = NULL;
+    application->image = NULL;
     application->running = 1;
     application->exit_code = -1;
     application->mode = None;
 
     strcpy(application->program_path, program_path);
     application->program_path[buflen] = 0;
-    application->loaded_filepath[0] = 0;
-    application->loaded_filename[0] = 0;
 
     return application;
 }
@@ -36,6 +35,7 @@ i32_t destroy_application_context(application_t* app_ptr)
     free(app_ptr->program_path);
     free(app_ptr->loaded_filepath);
     free(app_ptr->loaded_filename);
+    free(app_ptr->image);
     free(app_ptr);
 
     return exit_code;
@@ -89,6 +89,12 @@ i32_t command_load(char** params, i32_t count)
     free(application->loaded_filepath);
     free(application->loaded_filename);
 
+    if(application->image) 
+        free(application->image);
+
+	application->image = load_bitmap_file(filepath);
+    if (!application->image) return COMMAND_LOAD_ERROR;
+
     application->mode = Loaded;
     application->loaded_filepath = (char*)malloc(strlen(filepath) + 1);
     strcpy(application->loaded_filepath, filepath);
@@ -108,12 +114,14 @@ i32_t command_drop(char** params, i32_t count)
 {
 	free(application->loaded_filepath);
     free(application->loaded_filename);
+  
+	if (application->image)
+		free(application->image);
 
 	application->mode = None;
-    application->loaded_filepath = (char*)malloc(1);
-    application->loaded_filename = (char*)malloc(1);
-	application->loaded_filepath[0] = 0;
-	application->loaded_filename[0] = 0;
+	application->loaded_filepath = NULL;
+	application->loaded_filename = NULL;
+    application->image = NULL;
 
     return COMMAND_SUCCESS;
 }
