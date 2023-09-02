@@ -89,8 +89,7 @@ i32_t command_load(char** params, i32_t count)
     free(application->loaded_filepath);
     free(application->loaded_filename);
 
-    if(application->image) 
-        free(application->image);
+    destroy_bitmap_image(application->image);
 
 	application->image = load_bitmap_file(filepath);
     if (!application->image) return COMMAND_LOAD_ERROR;
@@ -115,13 +114,11 @@ i32_t command_drop(char** params, i32_t count)
 	free(application->loaded_filepath);
     free(application->loaded_filename);
   
-	if (application->image)
-		free(application->image);
+    destroy_bitmap_image(application->image);
 
 	application->mode = None;
 	application->loaded_filepath = NULL;
 	application->loaded_filename = NULL;
-    application->image = NULL;
 
     return COMMAND_SUCCESS;
 }

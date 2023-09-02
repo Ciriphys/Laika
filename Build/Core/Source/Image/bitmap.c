@@ -24,6 +24,8 @@ LKA_API bitmap_t* load_bitmap_file(char* filepath)
 	image->color_table = (bitmap_color_table_t*)	    malloc(sizeof(bitmap_color_table_t));
 	image->pixel_array = (bitmap_pixel_array_t*)		malloc(sizeof(bitmap_pixel_array_t));
 
+    image->color_table->colors = NULL;
+    
 	// Load bitmap data
 	load_bitmap_file_header(image, file);
 	load_bitmap_information_header(image, file);
@@ -39,6 +41,24 @@ LKA_API bitmap_t* load_bitmap_file(char* filepath)
 	fclose(file);
 
 	return image;
+}
+
+LKA_API void destroy_bitmap_image(bitmap_t* image)
+{
+    if(image)
+    {
+        free(image->header);
+        free(image->information);
+        
+        if(image->color_table->colors)
+            free(image->color_table->colors);
+        
+        free(image->color_table);
+        free(image->pixel_array->pixels);
+        free(image->pixel_array);
+        
+        image = NULL;
+    }
 }
 
 void load_bitmap_file_header(bitmap_t* image, FILE* file)
