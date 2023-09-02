@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #include "core.h"
 #include "color.h"
 
@@ -71,7 +73,7 @@ typedef struct __bitmap_format_t bitmap_t;
 
 LKA_API bitmap_t* load_bitmap_file(char* filepath);
 
-void load_bitmap_file_header		(bitmap_t* image, struct FILE* file);
-void load_bitmap_information_header	(bitmap_t* image, struct FILE* file);
-void load_bitmap_color_table		(bitmap_t* image, struct FILE* file);
-void load_bitmap_image_data			(bitmap_t* image, struct FILE* file);
+void load_bitmap_file_header		(bitmap_t* image, FILE* file);
+void load_bitmap_information_header	(bitmap_t* image, FILE* file);
+void load_bitmap_color_table		(bitmap_t* image, FILE* file);
+void load_bitmap_image_data			(bitmap_t* image, FILE* file);
