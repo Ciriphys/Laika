@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "application.h"
 
 application_t* application = NULL;
-const char* commands[COMMAND_COUNT] = { "load", "drop", "quit" };
+const char* commands[COMMAND_COUNT] = { "load", "drop", "rand", "quit" };
 const char* extensions[EXTENSIONS_COUNT] = { "bmp", "dib" };
 
 application_t* create_application_context(const char* program_path, u32_t buflen)
@@ -26,6 +27,9 @@ application_t* create_application_context(const char* program_path, u32_t buflen
     strcpy(application->program_path, program_path);
     application->program_path[buflen] = 0;
 
+    // Initialize random_seed
+    random_init((u64_t)time(NULL));
+    
     return application;
 }
 
@@ -151,6 +155,18 @@ i32_t command_drop(char** params, i32_t count)
 	application->loaded_filename = NULL;
 
     return COMMAND_SUCCESS;
+}
+
+i32_t command_rand()
+{
+    printf("Random i32_t: %d\n", random_i32());
+    printf("Random u32_t: %u\n", random_u32());
+    printf("Random i64_t: %lld\n", random_i64());
+    printf("Random u64_t: %llu\n", random_u64());
+    printf("Random f32_t: %ff\n", random_f32());
+    printf("Random f64_t: %lf\n", random_f64());
+    
+    return 0;
 }
 
 i32_t command_exit(i32_t exit_code)
@@ -303,6 +319,8 @@ int application_invoke_command(i32_t command, char** params, i32_t count)
         return command_load(params, count);
     case DROP_ID:
         return command_drop(params, count);
+    case RAND_ID:
+        return command_rand();
     case EXIT_ID:
         return command_exit(0);
     default:

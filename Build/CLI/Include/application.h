@@ -7,7 +7,7 @@
 
 // Maybe this should be increased?
 #define COMMAND_LENGTH		64
-#define COMMAND_COUNT		3
+#define COMMAND_COUNT		4
 #define EXTENSIONS_COUNT	2
 
 #define COMMAND_SUCCESS				0x0000	
@@ -20,7 +20,8 @@
 
 #define LOAD_ID 0x0000
 #define DROP_ID 0x0001
-#define EXIT_ID 0x0002
+#define RAND_ID 0x0002
+#define EXIT_ID 0x0003
 
 #define INVALID_ID 0xffff
 
@@ -83,6 +84,7 @@ char*	application_get_mode_text(application_mode_t mode);
 
 i32_t command_load(char** params, i32_t count);
 i32_t command_drop(char** params, i32_t count);
+i32_t command_rand();
 i32_t command_exit(i32_t exit_code);
 
 char* extract_filename (char* filepath);
