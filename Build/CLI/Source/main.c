@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "application.h"
-#include "converter.h"
+#include "laika.h"
 
 int main(int argc, char** argv)
 {

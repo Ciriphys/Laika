@@ -14,6 +14,9 @@ typedef unsigned int u32_t;
 typedef long long int i64_t;
 typedef unsigned long long int u64_t;
 
+typedef float f32_t;
+typedef double f64_t;
+
 // Aliases
 
 typedef unsigned char byte_t;
