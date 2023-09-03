@@ -4,9 +4,10 @@
 #include <time.h>
 
 #include "application.h"
+#include "command.h"
 
 application_t* application = NULL;
-const char* commands[COMMAND_COUNT] = { "load", "drop", "rand", "quit" };
+
 const char* extensions[EXTENSIONS_COUNT] = { "bmp", "dib" };
 
 application_t* create_application_context(const char* program_path, u32_t buflen)
@@ -105,77 +106,6 @@ char* application_get_mode_text(application_mode_t mode)
     default:
         return "";
     }
-}
-
-i32_t command_load(char** params, i32_t count)
-{
-    if (count == 1) return COMMAND_MISSING_DATA;
-   
-    char* filepath = params[1];
-    char* extension = extract_extension(filepath);
-
-    if (check_extension(extension)) return COMMAND_INVALID_EXTENSION;
-
-    FILE* file = fopen(filepath, "rb");
-    if (!file) return COMMAND_INVALID_DATA;
-    fclose(file);
-
-    free(application->loaded_filepath);
-    free(application->loaded_filename);
-
-	application->mode = Loaded;
-	application->loaded_filepath = (char*)malloc(strlen(filepath) + 1);
-	strcpy(application->loaded_filepath, filepath);
-	application->loaded_filepath[strlen(filepath)] = 0;
-    application->loaded_filename = extract_filename(filepath);
-
-	destroy_data(application);
-    load_data(application);
-
-    if (!application->data) return COMMAND_LOAD_ERROR;
-
-    printf("Loaded filename: %s\n", application->loaded_filename);
-    printf("Filename extension: %s\n", extension);
-
-    free(extension);
-
-    return COMMAND_SUCCESS;
-}
-
-i32_t command_drop(char** params, i32_t count)
-{
-	free(application->loaded_filepath);
-    free(application->loaded_filename);
-  
-    destroy_data(application);
-
-	application->mode = None;
-    application->type = NoData;
-	application->loaded_filepath = NULL;
-	application->loaded_filename = NULL;
-
-    return COMMAND_SUCCESS;
-}
-
-i32_t command_rand()
-{
-    printf("Random i32_t: %d\n", random_i32());
-    printf("Random u32_t: %u\n", random_u32());
-    printf("Random i64_t: %lld\n", random_i64());
-    printf("Random u64_t: %llu\n", random_u64());
-    printf("Random f32_t: %ff\n", random_f32());
-    printf("Random f64_t: %lf\n", random_f64());
-    
-    return 0;
-}
-
-i32_t command_exit(i32_t exit_code)
-{
-    application->exit_code = exit_code;
-    application->running = 0;
-    application->running = 0;
-
-    return exit_code;
 }
 
 char* extract_filename(char* filepath)
@@ -277,53 +207,17 @@ void application_parse_command(char* command)
         }
 	}
 
-    application_evaluate_command(params, size);
+    evaluate_command(params, size);
 }
 
-void application_evaluate_command(char** params, i32_t count)
+void load_file_information(char* filepath)
 {
-    if (count == 0) return;
+    free(application->loaded_filepath);
+    free(application->loaded_filename);
 
-    i32_t valid = 0;
-
-    // Load the first command
-    char* command = params[0];
-
-    for(i32_t i = 0; i < COMMAND_COUNT; i++)
-    {
-        if (strcmp(command, commands[i]) == 0)
-        {
-            i32_t result = application_invoke_command(i, params, count);
-            if (result) application_display_error_message(result);
-
-            valid = 1;
-        }
-    }
-
-    if (!valid) application_display_error_message(INVALID_ID);
-
-    // Destroy the parameters information
-	for (i32_t i = 0; i < count; i++)
-	{
-		free(params[i]);
-	}
-
-	free(params);
-}
-
-int application_invoke_command(i32_t command, char** params, i32_t count)
-{
-    switch (command)
-    {
-    case LOAD_ID:
-        return command_load(params, count);
-    case DROP_ID:
-        return command_drop(params, count);
-    case RAND_ID:
-        return command_rand();
-    case EXIT_ID:
-        return command_exit(0);
-    default:
-        return -1;
-    }
+    application->mode = Loaded;
+    application->loaded_filepath = (char*)malloc(strlen(filepath) + 1);
+    strcpy(application->loaded_filepath, filepath);
+    application->loaded_filepath[strlen(filepath)] = 0;
+    application->loaded_filename = extract_filename(filepath);
 }
