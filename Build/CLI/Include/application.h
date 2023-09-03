@@ -35,10 +35,17 @@
 enum __application_mode_t
 {
 	None = 0,
-	Loaded = 1,
+	Loaded = 1
+};
+
+enum __application_data_type_t
+{
+	NoData = 0,
+	Bitmap = 1
 };
 
 typedef enum __application_mode_t application_mode_t;
+typedef enum __application_data_type_t application_data_type_t;
 
 struct __application_t
 {
@@ -46,10 +53,12 @@ struct __application_t
 	i32_t running;
 
 	application_mode_t mode;
+	application_data_type_t type;
+
 	char* loaded_filepath;
 	char* loaded_filename;
 
-	bitmap_t* image;
+	void* data;
 
 	i32_t exit_code;
 };
@@ -58,6 +67,10 @@ typedef struct __application_t application_t;
 
 application_t* create_application_context(const char* program_path, u32_t buflen);
 i32_t	destroy_application_context(application_t* app_ptr);
+
+// Wrappers for loading and destroying image data.
+void load_data(application_t* app_ptr);
+void destroy_data(application_t* app_ptr);
 
 void    application_evaluate_command(char** params, i32_t count);
 i32_t   application_invoke_command(i32_t command, char** params, i32_t count);
@@ -76,3 +89,5 @@ char* extract_filename (char* filepath);
 char* extract_extension(char* filename);
 
 i32_t check_extension(char* extension);
+
+application_data_type_t get_type_from_extension(char* extension);

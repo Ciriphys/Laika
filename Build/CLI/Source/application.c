@@ -17,10 +17,11 @@ application_t* create_application_context(const char* program_path, u32_t buflen
     application->program_path = (char*)malloc(buflen + 1);
 	application->loaded_filepath = NULL;
 	application->loaded_filename = NULL;
-    application->image = NULL;
+    application->data = NULL;
     application->running = 1;
     application->exit_code = -1;
     application->mode = None;
+    application->type = NoData;
 
     strcpy(application->program_path, program_path);
     application->program_path[buflen] = 0;
@@ -35,10 +36,39 @@ i32_t destroy_application_context(application_t* app_ptr)
     free(app_ptr->program_path);
     free(app_ptr->loaded_filepath);
     free(app_ptr->loaded_filename);
-    free(app_ptr->image);
+    free(app_ptr->data);
     free(app_ptr);
 
     return exit_code;
+}
+
+void load_data(application_t* app_ptr)
+{
+	switch (app_ptr->type)
+	{
+	case Bitmap:
+        app_ptr->data = load_bitmap_file(app_ptr->loaded_filepath);
+        if (!app_ptr->data) command_drop(NULL, 0);
+		return;
+	case NoData:
+		return;
+	}
+}
+
+void destroy_data(application_t* app_ptr)
+{
+    switch (app_ptr->type)
+    {
+    case Bitmap:
+        if (app_ptr->data)
+        {
+            destroy_bitmap_image((bitmap_t*)app_ptr->data);
+            app_ptr->data = NULL;
+        }
+        return;
+    case NoData:
+        return;
+    }
 }
 
 void application_run(application_t* context)
@@ -89,17 +119,16 @@ i32_t command_load(char** params, i32_t count)
     free(application->loaded_filepath);
     free(application->loaded_filename);
 
-    destroy_bitmap_image(application->image);
-
-	application->image = load_bitmap_file(filepath);
-    if (!application->image) return COMMAND_LOAD_ERROR;
-
-    application->mode = Loaded;
-    application->loaded_filepath = (char*)malloc(strlen(filepath) + 1);
-    strcpy(application->loaded_filepath, filepath);
-    application->loaded_filepath[strlen(filepath)] = 0;
-
+	application->mode = Loaded;
+	application->loaded_filepath = (char*)malloc(strlen(filepath) + 1);
+	strcpy(application->loaded_filepath, filepath);
+	application->loaded_filepath[strlen(filepath)] = 0;
     application->loaded_filename = extract_filename(filepath);
+
+	destroy_data(application);
+    load_data(application);
+
+    if (!application->data) return COMMAND_LOAD_ERROR;
 
     printf("Loaded filename: %s\n", application->loaded_filename);
     printf("Filename extension: %s\n", extension);
@@ -114,9 +143,10 @@ i32_t command_drop(char** params, i32_t count)
 	free(application->loaded_filepath);
     free(application->loaded_filename);
   
-    destroy_bitmap_image(application->image);
+    destroy_data(application);
 
 	application->mode = None;
+    application->type = NoData;
 	application->loaded_filepath = NULL;
 	application->loaded_filename = NULL;
 
@@ -180,11 +210,24 @@ i32_t check_extension(char* extension)
     {
         if (strcmp(extension, extensions[i]) == 0)
         {
+            application->type = get_type_from_extension(extension);
             return SUCCESS;
         }
     }
 
     return ERROR;
+}
+
+application_data_type_t get_type_from_extension(char* extension)
+{
+    if (strcmp(extension, "bmp") == 0 || strcmp(extension, "dib") == 0)
+    {
+        return Bitmap;
+    }
+    else
+    {
+        return NoData;
+    }  
 }
 
 void application_parse_command(char* command)

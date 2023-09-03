@@ -3,7 +3,7 @@
 
 #include "Image/bitmap.h"
 
-LKA_API bitmap_t* load_bitmap_file(char* filepath)
+LKA_API void* load_bitmap_file(char* filepath)
 {
 	// Checks if the file exists; it should be, but you never know!
 	FILE* file = fopen(filepath, "rb");
@@ -40,7 +40,7 @@ LKA_API bitmap_t* load_bitmap_file(char* filepath)
 
 	fclose(file);
 
-	return image;
+	return (void*)image;
 }
 
 LKA_API void destroy_bitmap_image(bitmap_t* image)
@@ -56,8 +56,7 @@ LKA_API void destroy_bitmap_image(bitmap_t* image)
         free(image->color_table);
         free(image->pixel_array->pixels);
         free(image->pixel_array);
-        
-        image = NULL;
+		free(image);
     }
 }
 
