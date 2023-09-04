@@ -2,10 +2,11 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "laika.h"
 #include "command.h"
 
 const char* commands[COMMAND_COUNT] = { "load", "rand", "quit" };
-const char* bitmap_commands[COMMAND_BITMAP_COUNT] = { "edit", "drop" };
+const char* bitmap_commands[COMMAND_BITMAP_COUNT] = { "edit", "save", "drop" };
 
 int invoke_command(char* command, char** params, i32_t count)
 {
@@ -14,6 +15,9 @@ int invoke_command(char* command, char** params, i32_t count)
 	if (strcmp(command, "rand") == 0) return command_rand();
 	if (strcmp(command, "drop") == 0) return command_drop();
 	if (strcmp(command, "quit") == 0) return command_quit(0);
+    if (strcmp(command, "save") == 0) return command_bitmap_save(params, count);
+    
+    return ERROR;
 }
 
 void evaluate_command(char** params, i32_t count)
@@ -87,6 +91,46 @@ i32_t command_bitmap_edit(char** params, i32_t count)
 {
 	printf("Not yet implemented!\n");
 	return SUCCESS;
+}
+
+i32_t command_bitmap_save(char** params, i32_t count)
+{
+    if(count == 1) return COMMAND_MISSING_DATA;
+    
+    char* filename = NULL;
+    
+    for(i32_t i = 0; i < count - 1; i++)
+    {
+        if(strcmp(params[i], "!") == 0)
+        {
+            filename = extract_raw_filename(application->loaded_filename);
+            break;
+        }
+        else if(!filename)
+        {
+            filename = extract_raw_filename(params[i]);
+            break;
+        }
+    }
+    
+    char* extension = extract_extension(application->loaded_filename);
+    char* path = extract_path(application->loaded_filepath);
+    
+    i32_t path_len = (i32_t)strlen(path);
+    i32_t filename_len = (i32_t)strlen(filename);
+    i32_t extension_len = (i32_t)strlen(extension);
+    
+    char* filepath = (char*)malloc(path_len + filename_len + extension_len + 1);
+    strncpy(filepath, path, path_len);
+    strncat(filepath, filename, filename_len);
+    strncat(filepath, extension, extension_len);
+    filepath[path_len + filename_len + extension_len] = 0;
+    
+    free(filename);
+    free(extension);
+    free(path);
+    
+    return save_bitmap_file(filepath, (bitmap_t*)application->data);
 }
 
 i32_t command_drop()

@@ -61,8 +61,10 @@ char*	application_get_mode_text(application_mode_t mode);
 
 void	load_file_information(char* filepath);
 
-char* extract_filename (char* filepath);
+char* extract_raw_filename(char* filepath);
+char* extract_filename(char* filepath);
 char* extract_extension(char* filename);
+char* extract_path(char* filepath);
 
 i32_t check_extension(char* extension);
 

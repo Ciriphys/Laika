@@ -87,16 +87,16 @@ workspace "Laika"
             staticruntime "On"
             systemversion "latest"
             system "windows"
-            defines { "CLI_WIN", "_CRT_SECURE_NO_WARNINGS" }
+            defines { "CLI_WIN", "LKA_WIN", "_CRT_SECURE_NO_WARNINGS" }
 
         filter "system:Macosx"
             system "macosx"
-            defines { "CLI_MACOS" }
+            defines { "CLI_MACOS", "LKA_MACOS" }
 
         filter "system:Linux"
             pic "On"
             system "Linux"
-            defines { "CLI_LINUX" }
+            defines { "CLI_LINUX", "LKA_LINUX" }
             buildoptions { "-Wno-unused-result" }
 
         filter { "configurations:Debug" }

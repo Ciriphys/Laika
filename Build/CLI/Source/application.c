@@ -221,3 +221,54 @@ void load_file_information(char* filepath)
     application->loaded_filepath[strlen(filepath)] = 0;
     application->loaded_filename = extract_filename(filepath);
 }
+
+char* extract_raw_filename(char* filepath)
+{
+    i32_t length = (i32_t)strlen(filepath);
+    i32_t location = -1;
+    i32_t offset = 0;
+
+    for (i32_t i = length - 1; i > 0; i--)
+    {
+        if (filepath[i] == '\\' || filepath[i] == '/')
+        {
+            offset = i + 1;
+            break;
+        }
+        else if(filepath[i] == '.' && location == -1)
+        {
+            location = i;
+        }
+    }
+
+    char* filename = (char*)malloc(length - location + 1);
+    strncpy(filename, filepath + offset, length - location);
+    filename[length - location] = 0;
+
+    return filename;
+}
+
+char* extract_path(char* filepath)
+{
+    i32_t length = (i32_t)strlen(filepath);
+    i32_t offset = 0;
+
+    for (i32_t i = length - 1; i > 0; i--)
+    {
+        if (filepath[i] == '\\' || filepath[i] == '/')
+        {
+            offset = i;
+            break;
+        }
+    }
+
+    if(offset)
+    {
+        char* filename = (char*)malloc(offset + 1);
+        strncpy(filename, filepath, offset);
+        filename[offset] = 0;
+        
+        return filename;
+    }
+    else return NULL;
+}

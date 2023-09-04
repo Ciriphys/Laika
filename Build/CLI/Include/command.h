@@ -28,6 +28,7 @@ void  evaluate_specific(char** params, i32_t count, const char** command_list, i
 
 i32_t command_load(char** params, i32_t count);
 i32_t command_bitmap_edit(char** params, i32_t count);
+i32_t command_bitmap_save(char** params, i32_t count);
 i32_t command_drop();
 i32_t command_rand();
 i32_t command_quit(i32_t exit_code);
