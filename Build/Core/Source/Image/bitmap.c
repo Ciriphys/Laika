@@ -71,9 +71,15 @@ LKA_API int save_bitmap_file(char* destination, bitmap_t* image)
         return -1;
     }
     
-    fwrite(image->header, 14, 1, file);
-    fwrite(image->information, image->information->header_size, 1, file);
-    fwrite(image->pixel_array->pixels, image->pixel_array->pixel_count, 1, file);
+    fwrite(image->header->header_field,		sizeof(byte_t), 2, file);
+    fwrite(&image->header->size,			sizeof(i32_t),	1, file);
+	fwrite(image->header->reserved1,		sizeof(byte_t), 2, file);
+	fwrite(image->header->reserved2,		sizeof(byte_t), 2, file);
+	fwrite(&image->header->offset,			sizeof(i32_t),	1, file);
+
+	fwrite(image->information, image->information->header_size, 1, file);
+	fwrite(image->pixel_array->pixels, image->pixel_array->pixel_count, 1, file);
+
     fclose(file);
     
     return 0;

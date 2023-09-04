@@ -6,7 +6,7 @@
 // Maybe this should be increased?
 #define COMMAND_LENGTH			64
 #define COMMAND_COUNT			3
-#define COMMAND_BITMAP_COUNT	2	
+#define COMMAND_BITMAP_COUNT	3	
 
 #define MAX_LOAD_PARAMS 2
 #define MAX_DROP_PARAMS 1

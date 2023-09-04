@@ -99,7 +99,7 @@ i32_t command_bitmap_save(char** params, i32_t count)
     
     char* filename = NULL;
     
-    for(i32_t i = 0; i < count - 1; i++)
+    for(i32_t i = 1; i < count; i++)
     {
         if(strcmp(params[i], "!") == 0)
         {
@@ -113,6 +113,7 @@ i32_t command_bitmap_save(char** params, i32_t count)
         }
     }
     
+
     char* extension = extract_extension(application->loaded_filename);
     char* path = extract_path(application->loaded_filepath);
     
@@ -120,11 +121,19 @@ i32_t command_bitmap_save(char** params, i32_t count)
     i32_t filename_len = (i32_t)strlen(filename);
     i32_t extension_len = (i32_t)strlen(extension);
     
-    char* filepath = (char*)malloc(path_len + filename_len + extension_len + 1);
-    strncpy(filepath, path, path_len);
-    strncat(filepath, filename, filename_len);
-    strncat(filepath, extension, extension_len);
-    filepath[path_len + filename_len + extension_len] = 0;
+    char* filepath = (char*)malloc(path_len + filename_len + extension_len + 3);
+    strcpy(filepath, path);
+
+#ifdef CLI_WIN
+	strcat(filepath, "\\");
+#else
+	strcat(filepath, "/");
+#endif
+
+    strcat(filepath, filename);
+	strcat(filepath, ".");
+    strcat(filepath, extension);
+    filepath[path_len + filename_len + extension_len + 2] = 0;
     
     free(filename);
     free(extension);
