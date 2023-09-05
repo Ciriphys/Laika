@@ -62,7 +62,7 @@ LKA_API void destroy_bitmap_image(bitmap_t* image)
 
 LKA_API int save_bitmap_file(char* destination, bitmap_t* image)
 {
-    FILE* file = fopen(destination, "w+");
+    FILE* file = fopen(destination, "wb+");
     if(!file) return -1;
     
     if(image->information->colors)
@@ -77,8 +77,8 @@ LKA_API int save_bitmap_file(char* destination, bitmap_t* image)
 	fwrite(image->header->reserved2,		sizeof(byte_t), 2, file);
 	fwrite(&image->header->offset,			sizeof(i32_t),	1, file);
 
-	fwrite(image->information, image->information->header_size, 1, file);
-	fwrite(image->pixel_array->pixels, image->pixel_array->pixel_count, 1, file);
+	fwrite(image->information,		   sizeof(byte_t), image->information->header_size, file);
+	fwrite(image->pixel_array->pixels, sizeof(byte_t), image->pixel_array->pixel_count, file);
 
     fclose(file);
     
@@ -144,7 +144,7 @@ void load_bitmap_color_table(bitmap_t* image, FILE* file)
 
 void load_bitmap_image_data(bitmap_t* image, FILE* file)
 {
-	i64_t size = ceil(image->information->bpp * image->information->width / 32) * 4 * image->information->height;
+	i64_t size = ceil(image->information->bpp * image->information->width / 32.0) * 4 * image->information->height;
     
     image->pixel_array->pixel_count = size;
 	image->pixel_array->pixels = (byte_t*)malloc(size * sizeof(byte_t));
