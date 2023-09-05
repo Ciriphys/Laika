@@ -60,7 +60,7 @@ LKA_API void destroy_bitmap_image(bitmap_t* image)
     }
 }
 
-LKA_API int save_bitmap_file(char* destination, bitmap_t* image)
+LKA_API i32_t save_bitmap_file(char* destination, bitmap_t* image)
 {
     FILE* file = fopen(destination, "wb+");
     if(!file) return -1;

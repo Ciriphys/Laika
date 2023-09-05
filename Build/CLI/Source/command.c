@@ -135,11 +135,14 @@ i32_t command_bitmap_save(char** params, i32_t count)
     strcat(filepath, extension);
     filepath[path_len + filename_len + extension_len + 2] = 0;
     
+	i32_t result = save_bitmap_file(filepath, (bitmap_t*)application->data);;
+
+	free(filepath);
     free(filename);
     free(extension);
     free(path);
     
-    return save_bitmap_file(filepath, (bitmap_t*)application->data);
+	return result;
 }
 
 i32_t command_drop()
