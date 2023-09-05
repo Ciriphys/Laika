@@ -182,6 +182,11 @@ void application_parse_command(char* command)
     i32_t capacity = 2;
     char** params = (char**)malloc(capacity * sizeof(char*));
 
+    i32_t previous_length = 0;
+    i32_t first = 1;
+
+    // TODO : FIX THIS !
+     
     // Parse the command data
 	for (i32_t i = 0; i < COMMAND_LENGTH; i++)
 	{
@@ -196,11 +201,13 @@ void application_parse_command(char* command)
             params[size] = (char*)malloc(i + 1);
 
             // Move the source pointer and calculate the byte count accordingly
-            const char* source = size == 0 ? command : command + strlen(params[size - 1]) + 1;
-            u32_t count = size == 0 ? i : i - (u32_t)strlen(params[size - 1]) - 1;
+            const char* source = size == 0 ? command : command + previous_length + 1;
+            u32_t count = size == 0 ? i : i - (u32_t)previous_length - 1;
 
             strncpy(params[size], source, count);
+            previous_length += count + (first == 0);
             params[size][count] = 0;
+            first = 0;
             size++;
 
             if (command[i] == 0) break;

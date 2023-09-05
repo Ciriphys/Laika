@@ -85,6 +85,54 @@ LKA_API i32_t save_bitmap_file(char* destination, bitmap_t* image)
     return 0;
 }
 
+LKA_API bitmap_t* bitmap_invert(bitmap_t* image, i32_t red, i32_t green, i32_t blue)
+{
+	i32_t size = image->pixel_array->pixel_count;
+
+	for (i32_t j = 0; j < size; j++)
+	{
+		if (!red && j % 3 == 0) continue;
+		if (!green && j % 3 == 1) continue;
+		if (!blue && j % 3 == 2) continue;
+
+		image->pixel_array->pixels[j] = (byte_t)(255 - (i32_t)image->pixel_array->pixels[j]);
+	}
+
+	return image;
+}
+
+LKA_API bitmap_t* bitmap_set(bitmap_t* image, byte_t set_value, i32_t red, i32_t green, i32_t blue)
+{
+	i32_t size = image->pixel_array->pixel_count;
+
+	for (i32_t j = 0; j < size; j++)
+	{
+		if (!red && j % 3 == 0) continue;
+		if (!green && j % 3 == 1) continue;
+		if (!blue && j % 3 == 2) continue;
+
+		image->pixel_array->pixels[j] = set_value;
+	}
+
+	return image;
+}
+
+LKA_API bitmap_t* bitmap_grayscale(bitmap_t* image)
+{
+	i32_t size = image->pixel_array->pixel_count;
+
+	for (i32_t j = 0; j < size; j += 3)
+	{
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j] = average;
+		image->pixel_array->pixels[j + 1] = average;
+		image->pixel_array->pixels[j + 2] = average;
+	}
+
+	return image;
+}
+
 void load_bitmap_file_header(bitmap_t* image, FILE* file)
 {
 	fread(image->header->header_field,	sizeof(byte_t), 2, file);

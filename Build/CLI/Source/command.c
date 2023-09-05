@@ -89,8 +89,64 @@ i32_t command_load(char** params, i32_t count)
 
 i32_t command_bitmap_edit(char** params, i32_t count)
 {
-	printf("Not yet implemented!\n");
-	return SUCCESS;
+	const char* subcommands[] = { "invert", "grayscale", "set" };
+
+	i32_t command = -1;
+	i32_t set_value = -1;
+	i32_t red = 0, green = 0, blue = 0;
+
+	for (i32_t i = 1; i < count; i++)
+	{
+		printf("params[%d]: %s\n", i, params[i]);
+
+		i32_t can_skip = 0;
+
+		for (i32_t j = 0; j < 2 && command == -1; j++)
+		{
+			if (strcmp(params[i], subcommands[j]) == 0)
+			{
+				command = j;
+				can_skip = 1;
+				break;
+			}
+		}
+
+		if (can_skip) continue;
+
+		if (command == 1 && set_value == -1)
+		{
+			set_value = (i32_t)(byte_t)atoi(params[i]);
+			continue;
+		}
+
+		i32_t length = strlen(params[i]);
+
+		if (length == 1)
+		{
+			switch (params[i][0])
+			{
+				case 'r': red	= 1; break;
+				case 'g': green = 1; break;
+				case 'b': blue	= 1; break;
+				default: break;
+			}
+		}
+	}
+
+	switch (command)
+	{
+		case 0: 
+			bitmap_invert((bitmap_t*)application->data, red, green, blue);
+			return COMMAND_SUCCESS;
+		case 1:
+			bitmap_grayscale((bitmap_t*)application->data);
+			return COMMAND_SUCCESS;
+		case 2: 
+			bitmap_set((bitmap_t*)application->data, (byte_t)set_value, red, green, blue);
+			return COMMAND_SUCCESS; 
+		default: 
+			return COMMAND_INVALID_SUBCOMMAND;
+	}
 }
 
 i32_t command_bitmap_save(char** params, i32_t count)
@@ -135,7 +191,7 @@ i32_t command_bitmap_save(char** params, i32_t count)
     strcat(filepath, extension);
     filepath[path_len + filename_len + extension_len + 2] = 0;
     
-	i32_t result = save_bitmap_file(filepath, (bitmap_t*)application->data);;
+	i32_t result = save_bitmap_file(filepath, (bitmap_t*)application->data);
 
 	free(filepath);
     free(filename);

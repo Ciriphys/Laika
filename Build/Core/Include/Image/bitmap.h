@@ -77,6 +77,10 @@ LKA_API void destroy_bitmap_image(bitmap_t* image);
 
 LKA_API i32_t save_bitmap_file(char* destination, bitmap_t* image);
 
+LKA_API bitmap_t* bitmap_invert(bitmap_t* image, i32_t red, i32_t green, i32_t blue);
+LKA_API bitmap_t* bitmap_set(bitmap_t* image, byte_t set_value, i32_t red, i32_t green, i32_t blue);
+LKA_API bitmap_t* bitmap_grayscale(bitmap_t* image);
+
 void load_bitmap_file_header		(bitmap_t* image, FILE* file);
 void load_bitmap_information_header	(bitmap_t* image, FILE* file);
 void load_bitmap_color_table		(bitmap_t* image, FILE* file);

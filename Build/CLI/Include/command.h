@@ -19,6 +19,7 @@
 #define COMMAND_INVALID_MODE		0x0005		
 #define COMMAND_LOAD_ERROR			0x0006		// Caused when the object loading function returns NULL
 #define COMMAND_UNKNOWN				0x0007		
+#define COMMAND_INVALID_SUBCOMMAND	0x0008
 
 extern application_t* application;
 
