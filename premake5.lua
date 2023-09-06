@@ -4,7 +4,11 @@ workspace "Laika"
     startproject "LaikaCLI"
 
     outDir = "%{cfg.buildcfg}_%{cfg.system}_%{cfg.architecture}"
-    
+
+    project "Sandbox"
+        kind "ConsoleApp"
+        language "C"
+
     project "LaikaLib"
         location "Build/Core"
         kind "SharedLib"
