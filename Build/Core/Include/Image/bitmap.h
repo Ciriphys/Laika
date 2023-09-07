@@ -81,6 +81,8 @@ LKA_API bitmap_t* bitmap_invert(bitmap_t* image, i32_t red, i32_t green, i32_t b
 LKA_API bitmap_t* bitmap_set(bitmap_t* image, byte_t set_value, i32_t red, i32_t green, i32_t blue);
 LKA_API bitmap_t* bitmap_grayscale(bitmap_t* image);
 
+i32_t check_padding_byte(i32_t pb, i32_t width, i32_t idx);
+
 void load_bitmap_file_header		(bitmap_t* image, FILE* file);
 void load_bitmap_information_header	(bitmap_t* image, FILE* file);
 void load_bitmap_color_table		(bitmap_t* image, FILE* file);
