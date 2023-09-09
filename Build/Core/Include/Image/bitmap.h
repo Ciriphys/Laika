@@ -86,6 +86,7 @@ LKA_API bitmap_t* bitmap_redscale				(bitmap_t* image);
 LKA_API bitmap_t* bitmap_colorscale				(bitmap_t* image, i32_t color_mask);
 LKA_API bitmap_t* bitmap_inverted_colorscale	(bitmap_t* image, i32_t color_mask);
 LKA_API bitmap_t* bitmap_filter					(bitmap_t* image, i32_t rgb_mask);
+LKA_API bitmap_t* bitmap_omogeneous_convolution	(bitmap_t* image, f64_t factor);
 
 i32_t check_padding_byte(i32_t pb, i32_t width, i32_t idx);
 

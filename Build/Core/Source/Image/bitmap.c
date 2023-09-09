@@ -350,6 +350,79 @@ LKA_API bitmap_t* bitmap_filter(bitmap_t* image, i32_t rgb_mask)
 	return image;
 }
 
+LKA_API bitmap_t* bitmap_omogeneous_convolution(bitmap_t* image, f64_t factor)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t height = image->information->height;
+	i32_t pb_size = image->pixel_array->pixel_count / height;
+	i32_t pb = pb_size - width;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	byte_t* convulted_pixels = (byte_t*)malloc(size * sizeof(byte_t));
+	byte_t* pixels = image->pixel_array->pixels;
+
+	// Corner indexes
+	i32_t ur_corner = pb_size * (height - 1) - pb - 2;
+	i32_t lr_corner = 2 * pb_size - pb - 2;
+	i32_t ul_corner = pb_size * (height - 2) + 1;
+	i32_t ll_corner = pb_size + 1;
+
+	// Kernel offsets
+	i32_t u = pb_size;
+	i32_t d = -pb_size;
+	i32_t l = -1;
+	i32_t r = 1;
+	i32_t ul = pb_size - 1;
+	i32_t ur = pb_size + 1;
+	i32_t dl = -pb_size - 1;
+	i32_t dr = -pb_size + 1;
+
+	for (i32_t j = 0; j < size; j++)
+	{
+		if (check_padding_byte(pb_size, width, j))
+		{
+			for (i32_t i = 0; i < pb; i++) convulted_pixels[i + j] = 0;
+
+			j--;
+			j += pb;
+			continue;
+		}
+
+		i32_t column = j % pb_size;
+		i32_t row = j / pb_size;
+
+		i32_t convolution_index = j;
+
+		if (row == 0) convolution_index += pb_size;
+		if (row == height - 1) convolution_index -= pb_size;
+
+		if (column == 0) convolution_index += r;
+		if (column == pb_size - pb - 1) convolution_index += l;
+
+		byte_t convoluted = (byte_t)(factor * (
+			((i32_t)pixels[convolution_index + ul] +
+			(i32_t)pixels[convolution_index + u] +
+			(i32_t)pixels[convolution_index + ur] +
+			(i32_t)pixels[convolution_index + l] + 
+			(i32_t)pixels[convolution_index] + 
+			(i32_t)pixels[convolution_index + r] +
+			(i32_t)pixels[convolution_index + dl] +
+			(i32_t)pixels[convolution_index + d] + 
+			(i32_t)pixels[convolution_index + dr])));
+
+		convulted_pixels[j] = convoluted;
+	}
+
+	free(pixels);
+	image->pixel_array->pixels = convulted_pixels;
+
+	return image;
+}
+
 i32_t check_padding_byte(i32_t pb, i32_t width, i32_t idx)
 {
 	return pb && idx % pb > width - 1;
