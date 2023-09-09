@@ -350,7 +350,7 @@ LKA_API bitmap_t* bitmap_filter(bitmap_t* image, i32_t rgb_mask)
 	return image;
 }
 
-LKA_API bitmap_t* bitmap_omogeneous_convolution(bitmap_t* image, f64_t factor)
+LKA_API bitmap_t* bitmap_noise(bitmap_t* image, f64_t factor)
 {
 	if (image->information->bpp < 8) return NULL;
 
