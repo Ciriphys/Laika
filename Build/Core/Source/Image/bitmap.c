@@ -99,9 +99,10 @@ LKA_API bitmap_t* bitmap_invert(bitmap_t* image, i32_t red, i32_t green, i32_t b
 	{
 		if (check_padding_byte(pb, width, j)) continue;
 
-		if (!red && j % 3 == 0) continue;
-		if (!green && j % 3 == 1) continue;
-		if (!blue && j % 3 == 2) continue;
+		if (!red && j % bytes == 0) continue;
+		if (!green && j % bytes == 1) continue;
+		if (!blue && j % bytes == 2) continue;
+		if (bytes == 4 && j % bytes == 3) continue;
 
 		image->pixel_array->pixels[j] = (byte_t)(255 - (i32_t)image->pixel_array->pixels[j]);
 	}
@@ -123,9 +124,10 @@ LKA_API bitmap_t* bitmap_set(bitmap_t* image, byte_t set_value, i32_t red, i32_t
 	{
 		if (check_padding_byte(pb, width, j)) continue;
 
-		if (!red && j % 3 == 0) continue;
-		if (!green && j % 3 == 1) continue;
-		if (!blue && j % 3 == 2) continue;
+		if (!red && j % bytes == 0) continue;
+		if (!green && j % bytes == 1) continue;
+		if (!blue && j % bytes == 2) continue;
+		if (bytes == 4 && j % bytes == 3) continue;
 
 		image->pixel_array->pixels[j] = set_value;
 	}
@@ -164,7 +166,7 @@ LKA_API bitmap_t* bitmap_grayscale(bitmap_t* image)
 
 i32_t check_padding_byte(i32_t pb, i32_t width, i32_t idx)
 {
-	return pb && idx % pb >= width;
+	return pb && idx % pb > width - 1;
 }
 
 void load_bitmap_file_header(bitmap_t* image, FILE* file)
