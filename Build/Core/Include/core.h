@@ -14,6 +14,8 @@
     #endif
 #endif
 
+#define EXTRACT_BYTE(from, n) ((from >> 8 * (n - 1)) & 0xff)
+
 // Suppress IntelliSense's C warnings on Windows
 #ifdef LKA_WIN
     #pragma warning(disable:6011)

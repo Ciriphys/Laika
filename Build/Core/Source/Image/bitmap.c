@@ -251,6 +251,105 @@ LKA_API bitmap_t* bitmap_redscale(bitmap_t* image)
 	return image;
 }
 
+LKA_API bitmap_t* bitmap_colorscale(bitmap_t* image, i32_t color_mask)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t pb = image->pixel_array->pixel_count / image->information->height;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	double red_mask	  = EXTRACT_BYTE(color_mask, 3) / 255.0;
+	double green_mask = EXTRACT_BYTE(color_mask, 2) / 255.0;
+	double blue_mask  = EXTRACT_BYTE(color_mask, 1) / 255.0;
+
+	for (i32_t j = 0; j < size; j += bytes)
+	{
+		if (check_padding_byte(pb, width, j))
+		{
+			j -= bytes;
+			j += pb - width;
+			continue;
+		}
+
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j]	  = (byte_t)(average * blue_mask);
+		image->pixel_array->pixels[j + 1] = (byte_t)(average * green_mask);
+		image->pixel_array->pixels[j + 2] = (byte_t)(average * red_mask);
+	}
+
+	return image;
+}
+
+LKA_API bitmap_t* bitmap_inverted_colorscale(bitmap_t* image, i32_t color_mask)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t pb = image->pixel_array->pixel_count / image->information->height;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	byte_t red_mask		= EXTRACT_BYTE(color_mask, 3);
+	byte_t green_mask	= EXTRACT_BYTE(color_mask, 2);
+	byte_t blue_mask	= EXTRACT_BYTE(color_mask, 1);
+
+	for (i32_t j = 0; j < size; j += bytes)
+	{
+		if (check_padding_byte(pb, width, j))
+		{
+			j -= bytes;
+			j += pb - width;
+			continue;
+		}
+
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j]	  = average * blue_mask;
+		image->pixel_array->pixels[j + 1] = average * green_mask;
+		image->pixel_array->pixels[j + 2] = average * red_mask;
+	}
+
+	return image;
+}
+
+LKA_API bitmap_t* bitmap_filter(bitmap_t* image, i32_t rgb_mask)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t pb = image->pixel_array->pixel_count / image->information->height;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	double red_mask = EXTRACT_BYTE(rgb_mask, 3) / 255.0;
+	double green_mask = EXTRACT_BYTE(rgb_mask, 2) / 255.0;
+	double blue_mask = EXTRACT_BYTE(rgb_mask, 1) / 255.0;
+
+	for (i32_t j = 0; j < size; j += bytes)
+	{
+		if (check_padding_byte(pb, width, j))
+		{
+			j -= bytes;
+			j += pb - width;
+			continue;
+		}
+
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j] *= blue_mask;
+		image->pixel_array->pixels[j + 1] *= green_mask;
+		image->pixel_array->pixels[j + 2] *= red_mask;
+	}
+
+	return image;
+}
+
 i32_t check_padding_byte(i32_t pb, i32_t width, i32_t idx)
 {
 	return pb && idx % pb > width - 1;
