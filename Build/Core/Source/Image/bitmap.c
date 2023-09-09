@@ -164,6 +164,93 @@ LKA_API bitmap_t* bitmap_grayscale(bitmap_t* image)
 	return image;
 }
 
+LKA_API bitmap_t* bitmap_bluescale(bitmap_t* image)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t pb = image->pixel_array->pixel_count / image->information->height;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	for (i32_t j = 0; j < size; j += bytes)
+	{
+		if (check_padding_byte(pb, width, j))
+		{
+			j -= bytes;
+			j += pb - width;
+			continue;
+		}
+
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j] = average;
+		image->pixel_array->pixels[j + 1] = 0;
+		image->pixel_array->pixels[j + 2] = 0;
+	}
+
+	return image;
+}
+
+LKA_API bitmap_t* bitmap_greenscale(bitmap_t* image)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t pb = image->pixel_array->pixel_count / image->information->height;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	for (i32_t j = 0; j < size; j += bytes)
+	{
+		if (check_padding_byte(pb, width, j))
+		{
+			j -= bytes;
+			j += pb - width;
+			continue;
+		}
+
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j] = 0;
+		image->pixel_array->pixels[j + 1] = average;
+		image->pixel_array->pixels[j + 2] = 0;
+	}
+
+	return image;
+}
+
+LKA_API bitmap_t* bitmap_redscale(bitmap_t* image)
+{
+	if (image->information->bpp < 8) return NULL;
+
+	i32_t bytes = image->information->bpp / 8;
+	i32_t width = bytes * image->information->width;
+	i32_t pb = image->pixel_array->pixel_count / image->information->height;
+
+	i32_t size = image->pixel_array->pixel_count;
+
+	for (i32_t j = 0; j < size; j += bytes)
+	{
+		if (check_padding_byte(pb, width, j))
+		{
+			j -= bytes;
+			j += pb - width;
+			continue;
+		}
+
+		byte_t average = (byte_t)((image->pixel_array->pixels[j] + image->pixel_array->pixels[j + 1] + image->pixel_array->pixels[j + 2]) / 3);
+
+		image->pixel_array->pixels[j] = 0;
+		image->pixel_array->pixels[j + 1] = 0;
+		image->pixel_array->pixels[j + 2] = average;
+	}
+
+	return image;
+}
+
 i32_t check_padding_byte(i32_t pb, i32_t width, i32_t idx)
 {
 	return pb && idx % pb > width - 1;
